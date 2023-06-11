@@ -51,7 +51,6 @@ const deleteCard = (req, res) => {
 
 const likeCard = (req, res) => {
   const { cardId } = req.params;
-  console.log(req.user._id);
 
   Card.findByIdAndUpdate(
     cardId,
