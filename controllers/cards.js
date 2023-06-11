@@ -10,13 +10,7 @@ const {
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => {
-      if (cards.length === 0) {
-        res.status(NOT_FOUND).send({ message: 'Карточки не найдены. (404)' });
-        return;
-      }
-      res.status(SUCCESS).send({ data: cards });
-    })
+    .then((cards) => res.status(SUCCESS).send({ data: cards }))
     .catch(() => res.status(DEFAULT_ERROR_CODE).send({ message: DEFAULT_ERROR_MESSAGE }));
 };
 
