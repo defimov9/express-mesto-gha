@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+const { NOT_FOUND } = require('./utils/errors');
 
 const app = express();
 
@@ -23,5 +24,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
+app.use('*', (req, res) => {
+  res.status(NOT_FOUND).send({ message: 'Страница не найдена. (404)' });
+});
 
 app.listen(3000, () => console.log('App listening on port 3000'));

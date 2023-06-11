@@ -31,7 +31,13 @@ const getUser = (req, res) => {
       }
       res.status(SUCCESS).send({ data: user });
     })
-    .catch(() => res.status(DEFAULT_ERROR_CODE).send({ message: DEFAULT_ERROR_MESSAGE }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные. (400)' });
+        return;
+      }
+      res.status(DEFAULT_ERROR_CODE).send({ message: DEFAULT_ERROR_MESSAGE });
+    });
 };
 
 const createUser = (req, res) => {
