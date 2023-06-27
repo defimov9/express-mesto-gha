@@ -11,7 +11,7 @@ const getUsers = (req, res, next) => {
       if (!users) {
         throw new NotFoundError('Пользователи не найдены.');
       }
-      res.send({ data: users });
+      res.send({ users });
     })
     .catch((next));
 };
@@ -24,7 +24,7 @@ const getUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      res.send({ data: user });
+      res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -52,7 +52,13 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.send({ data: user });
+      res.send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user.id,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -81,7 +87,7 @@ const updateUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      res.send({ data: user });
+      res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -106,7 +112,7 @@ const updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      res.send({ data: user });
+      res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -126,7 +132,7 @@ const login = (req, res) => {
         'some-secret-key',
         { expiresIn: '7d' },
       );
-      res.send(token);
+      res.send({ token });
     })
     .catch((err) => {
       res
