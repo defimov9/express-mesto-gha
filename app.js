@@ -1,12 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
-const errors = require('./middlewares/errors');
-const NotFoundError = require('./errors/NotFoundError');
+const errorsHandler = require('./middlewares/errors');
 
 const app = express();
 
@@ -23,9 +22,6 @@ app.post(
     body: Joi.object().keys({
       email: Joi.string().required().email(),
       password: Joi.string().required(),
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string().regex(/^https?:\/\/(?:[a-z0-9\\-]+\.)+[a-z]{2,6}(?:\/[^/#?]+)+\.(?:jpe?g|gif|png|bmp|webp)$/im),
     }),
   }),
   login,
@@ -34,11 +30,11 @@ app.post(
   '/signup',
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      password: Joi.string().required(),
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string().regex(/^https?:\/\/(?:[a-z0-9\\-]+\.)+[a-z]{2,6}(?:\/[^/#?]+)+\.(?:jpe?g|gif|png|bmp|webp)$/im),
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
     }),
   }),
   createUser,
@@ -47,10 +43,11 @@ app.post(
 app.use('/', userRouter);
 app.use('/', cardRouter);
 
-app.use(errors);
+app.use(errors());
+app.use(errorsHandler);
 
-app.use('*', (req, res, next) => {
-  next(new NotFoundError('Страница не найдена.'));
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Страница не найдена.' });
 });
 
 app.listen(3000, () => console.log('App listening on port 3000'));
