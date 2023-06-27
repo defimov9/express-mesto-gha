@@ -142,7 +142,7 @@ const login = (req, res) => {
 };
 
 const getMe = (req, res, next) => {
-  const { _id } = req.user._id;
+  const _id = req.params.userId ? req.params.userId : req.user._id;
 
   User.findById(_id)
     .then((user) => {
