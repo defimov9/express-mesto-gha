@@ -44,11 +44,11 @@ app.post(
 app.use('/', userRouter);
 app.use('/', cardRouter);
 
-app.use(errors());
-app.use(errorsHandler);
-
-app.use('*', (req, res, next) => {
+app.use('*', () => {
   throw new NotFoundError('Страница не найдена.');
 });
+
+app.use(errors());
+app.use(errorsHandler);
 
 app.listen(3000, () => console.log('App listening on port 3000'));

@@ -27,7 +27,6 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const owner = req.user._id;
-  let deletedCard;
 
   Card.findById(cardId)
     .then((card) => {
@@ -37,10 +36,9 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() !== owner) {
         throw new ForbiddenError('Нельзя удалять карточки других пользователей');
       }
-      deletedCard = card;
-      return card.remove();
+      return Card.findByIdAndRemove(card._id);
     })
-    .then(() => {
+    .then((deletedCard) => {
       res.send(deletedCard);
     })
     .catch((err) => {
