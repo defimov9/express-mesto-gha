@@ -18,6 +18,7 @@ const createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });
@@ -26,8 +27,9 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const owner = req.user._id;
+  let deletedCard;
 
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена.');
@@ -35,11 +37,16 @@ const deleteCard = (req, res, next) => {
       if (card.owner.toString() !== owner) {
         throw new ForbiddenError('Нельзя удалять карточки других пользователей');
       }
-      res.send(card);
+      deletedCard = card;
+      return card.remove();
+    })
+    .then(() => {
+      res.send(deletedCard);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });
@@ -64,6 +71,7 @@ const likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });
@@ -88,6 +96,7 @@ const dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });

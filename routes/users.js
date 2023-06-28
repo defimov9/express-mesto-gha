@@ -15,31 +15,31 @@ router.get('/users/me', auth, getMe);
 
 router.get(
   '/users/:userId',
-  celebrate({ params: Joi.object().keys({ userId: Joi.string().length(24).hex() }) }),
   auth,
+  celebrate({ params: Joi.object().keys({ userId: Joi.string().length(24).hex() }) }),
   getUser,
 );
 
 router.patch(
   '/users/me',
+  auth,
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
+      name: Joi.string().min(2).max(30).required(),
+      about: Joi.string().min(2).max(30).required(),
     }),
   }),
-  auth,
   updateUser,
 );
 
 router.patch(
   '/users/me/avatar',
+  auth,
   celebrate(
     {
-      body: Joi.object().keys({ avatar: Joi.string().pattern(/^https?:\/\/(?:[a-z0-9\\-]+\.)+[a-z]{2,6}(?:\/[^/#?]+)+\.(?:jpe?g|gif|png|bmp|webp)$/im) }),
+      body: Joi.object().keys({ avatar: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/).required() }),
     },
   ),
-  auth,
   updateAvatar,
 );
 
