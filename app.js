@@ -6,6 +6,7 @@ const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const errorsHandler = require('./middlewares/errors');
+const NotFoundError = require('./errors/NotFoundError');
 
 const app = express();
 
@@ -43,11 +44,11 @@ app.post(
 app.use('/', userRouter);
 app.use('/', cardRouter);
 
+app.use('*', () => {
+  throw new NotFoundError('Страница не найдена.');
+});
+
 app.use(errors());
 app.use(errorsHandler);
-
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Страница не найдена.' });
-});
 
 app.listen(3000, () => console.log('App listening on port 3000'));

@@ -8,9 +8,6 @@ const ConflictError = require('../errors/ConflictError');
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
-      if (!users) {
-        throw new NotFoundError('Пользователи не найдены.');
-      }
       res.send({ users });
     })
     .catch((next));
@@ -29,6 +26,7 @@ const getUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });
@@ -63,6 +61,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       if (err.code === 11000) {
         next(new ConflictError('Такой пользователь уже существует'));
@@ -92,6 +91,7 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });
@@ -117,12 +117,13 @@ const updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -134,11 +135,7 @@ const login = (req, res) => {
       );
       res.send({ token });
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
 const getMe = (req, res, next) => {
@@ -154,6 +151,7 @@ const getMe = (req, res, next) => {
     .catch((err) => {
       if (err.kind === 'ObjectId') {
         next(new BadRequestError('Переданы некорректные данные.'));
+        return;
       }
       next(err);
     });
